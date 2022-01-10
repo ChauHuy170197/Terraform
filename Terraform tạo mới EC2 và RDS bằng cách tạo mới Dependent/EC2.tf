@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "ap-southeast-1"
+  region = "us-east-2"
 }
 resource "aws_vpc" "vpc" {
     cidr_block = "10.10.0.0/16"
@@ -14,7 +14,7 @@ resource "aws_internet_gateway" "internet_gateway" {
 }
 resource "aws_subnet" "pub_subnet" {
     vpc_id                  = aws_vpc.vpc.id
-    cidr_block              = "10.10.0.0/22"
+    cidr_block              = "10.10.4.0/24"
 }
 resource "aws_route_table" "public" {
     vpc_id = aws_vpc.vpc.id
@@ -38,6 +38,13 @@ resource "aws_security_group" "test"{
         protocol        = "tcp"
         cidr_blocks     = ["0.0.0.0/0"]
     }
+    egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+   }
 
     ingress {
         from_port       = 443
@@ -45,20 +52,6 @@ resource "aws_security_group" "test"{
         protocol        = "tcp"
         cidr_blocks     = ["0.0.0.0/0"]
     }
-}
-resource "aws_instance" "hello" {
-  ami           = "ami-055d15d9cfddf7bd3"
-  instance_type = "t2.micro"
-  security_groups      = ["${aws_security_group.test.id}"]
-  subnet_id = "${aws_subnet.pub_subnet.id}"
-  tags = {
-     Name = "hello"
-  }
-}
-output "ec2" {
-  value = {
-    public_ip = aws_instance.hello.public_ip
-  }
 }
 resource "tls_private_key" "this" {
   algorithm = "RSA"
@@ -69,4 +62,18 @@ module "key_pair" {
 
   key_name   = "huy-key"
   public_key = tls_private_key.this.public_key_openssh
+}
+resource "aws_instance" "hello" {
+  ami           = "ami-0629230e074c580f2"
+  instance_type = "t2.micro"
+  security_groups      = ["${aws_security_group.test.id}"]
+  subnet_id = "${aws_subnet.pub_subnet.id}"
+  key_name = module.key_pair.key_pair_key_name
+  tags = {
+     Name = "hello"
+  }
+}
+output "instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = aws_instance.hello.public_ip
 }
