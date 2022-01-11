@@ -1,30 +1,19 @@
 provider "aws" {
   region = "us-east-2"
 }
-resource "aws_vpc" "vpc" {
-    cidr_block = "10.10.0.0/16"
-    enable_dns_support   = true
-    enable_dns_hostnames = true
-    tags       = {
-        Name = "Terraform VPC"
-    }
-}
-resource "aws_internet_gateway" "internet_gateway" {
-    vpc_id = aws_vpc.vpc.id
-}
 resource "aws_subnet" "rds_subnet" {
-  vpc_id     = aws_vpc.vpc.id
+#vpc_id se lay id cua vpc da tao cua ec2
+  vpc_id     = "vpc-094b10c1618008fce"
   cidr_block = "10.10.5.0/24"
   availability_zone = "us-east-2a"
 }
-
 resource "aws_subnet" "rds_subnet1" {
-  vpc_id     = aws_vpc.vpc.id
+  vpc_id     = "vpc-094b10c1618008fce"
   cidr_block = "10.10.6.0/24"
   availability_zone = "us-east-2b"
 }
 resource "aws_security_group" "rds_sg" {
-    vpc_id      = aws_vpc.vpc.id
+    vpc_id      = "vpc-094b10c1618008fce"
     name    = "alow_sql"
     ingress {
         protocol        = "tcp"
@@ -41,8 +30,8 @@ resource "aws_security_group" "rds_sg" {
     }
 }
 resource "aws_db_subnet_group" "db_subnet_group" {
-    name       = "database subnet"
-    subnet_ids = ["${aws_subnet.rds_subnet.id}","${aws_subnet.rds_subnet1.id}"]
+    name       = "database_subnet"
+    subnet_ids = [aws_subnet.rds_subnet.id, aws_subnet.rds_subnet1.id]
 }
 resource "aws_db_instance" "mysql" {
     identifier                = "mysql"
@@ -63,3 +52,4 @@ resource "aws_db_instance" "mysql" {
     final_snapshot_identifier = "huy-final"
     publicly_accessible       = true
 }
+

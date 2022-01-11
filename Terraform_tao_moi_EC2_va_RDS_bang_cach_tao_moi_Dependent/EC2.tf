@@ -24,7 +24,6 @@ resource "aws_route_table" "public" {
         gateway_id = aws_internet_gateway.internet_gateway.id
     }
 }
-
 resource "aws_route_table_association" "route_table_association" {
     subnet_id      = aws_subnet.pub_subnet.id
     route_table_id = aws_route_table.public.id
@@ -56,17 +55,15 @@ resource "aws_security_group" "test"{
 resource "tls_private_key" "this" {
   algorithm = "RSA"
 }
-
 module "key_pair" {
   source = "terraform-aws-modules/key-pair/aws"
-
   key_name   = "huy-key"
   public_key = tls_private_key.this.public_key_openssh
 }
 resource "aws_instance" "hello" {
   ami           = "ami-0629230e074c580f2"
   instance_type = "t2.micro"
-  security_groups      = ["${aws_security_group.test.id}"]
+  security_groups      = [aws_security_group.test.id]
   subnet_id = "${aws_subnet.pub_subnet.id}"
   key_name = module.key_pair.key_pair_key_name
   tags = {
@@ -77,3 +74,4 @@ output "instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = aws_instance.hello.public_ip
 }
+
