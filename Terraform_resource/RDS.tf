@@ -1,19 +1,15 @@
-provider "aws" {
-  region = "us-east-2"
-}
 resource "aws_subnet" "rds_subnet" {
-#vpc_id se lay id cua vpc da tao cua ec2
-  vpc_id     = "vpc-094b10c1618008fce"
+  vpc_id     = aws_vpc.vpc.id
   cidr_block = "10.10.5.0/24"
   availability_zone = "us-east-2a"
 }
 resource "aws_subnet" "rds_subnet1" {
-  vpc_id     = "vpc-094b10c1618008fce"
+  vpc_id     = aws_vpc.vpc.id
   cidr_block = "10.10.6.0/24"
   availability_zone = "us-east-2b"
 }
 resource "aws_security_group" "rds_sg" {
-    vpc_id      = "vpc-094b10c1618008fce"
+    vpc_id      = aws_vpc.vpc.id
     name    = "alow_sql"
     ingress {
         protocol        = "tcp"

@@ -1,6 +1,3 @@
-provider "aws" {
-  region = "us-east-2"
-}
 module "db" {
     source  = "terraform-aws-modules/rds/aws"
     identifier                = "mysql"
@@ -15,13 +12,13 @@ module "db" {
     username                  = "huy"
     password                  = "Huy1701972021"
     port                      = "3306"
-  vpc_security_group_ids = ["sg-03e0c95e9bd528b4c"]
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
   tags = {
     Owner       = "user"
     Environment = "dev"
   }
   # DB subnet group
-  subnet_ids = ["subnet-0404657a0820f9d7b", "subnet-0ee7052f456797db6"]
+  subnet_ids = [aws_subnet.rds_subnet.id, aws_subnet.rds_subnet1.id]
   # DB parameter group
   family = "mysql5.7"
   # DB option group
