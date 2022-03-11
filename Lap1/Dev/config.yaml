@@ -1,0 +1,43 @@
+namespace: dev
+
+sg:
+  bastion_sg: brk-bastion-sg
+  web_sg: brk-web-sg
+  db_sg: brk-db-sg
+  lb_sg: brk-lb-sg
+
+bastion:
+  key_name: public-key
+  public_key: public-key.pub
+  instance_name: brk-bastion
+
+webserver:
+  key_name: public-key
+  public_key: public-key.pub
+  instance_name: webserver
+
+rds:
+  name: brk-db
+  username: brk
+  database_name: brk
+  replica_count: 1
+  parameter: 
+    - name: "time_zone" 
+      value: "Asia/Tokyo"
+    - name: "event_scheduler"
+      value: "ON"
+
+s3:
+  bucket_name: 
+    - brk-brook-abcd
+
+asg:
+  alb:
+    tg_name: brk-tg
+    lb_name: brk-lb
+  asg_name: brk-asg
+  desired_capacity: 1
+  max_size: 3
+  min_size: 1
+  instance_name: brk-instance
+  instance_type: t2.micro
